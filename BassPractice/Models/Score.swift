@@ -143,6 +143,7 @@ enum ScoreSource: String, Codable {
     case pdfImport = "pdf_import"
     case msczImport = "mscz_import"
     case userCreated = "user_created"
+    case scalePractice = "scale_practice"
 }
 
 enum InstrumentType: String, Codable, CaseIterable {

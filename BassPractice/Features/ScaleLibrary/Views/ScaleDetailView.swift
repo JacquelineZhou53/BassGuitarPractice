@@ -4,6 +4,7 @@ struct ScaleDetailView: View {
     @Bindable var viewModel: ScaleLibraryViewModel
     var initialScale: Scale?
     @State private var showFingeringComparison = false
+    @State private var showScalePractice = false
 
     var body: some View {
         ScrollView {
@@ -21,6 +22,7 @@ struct ScaleDetailView: View {
                         instrumentType: viewModel.instrumentType
                     )
                     fingeringSelectorSection
+                    practiceButton
                     noteInfoSection
                 } else if viewModel.selectedScale != nil {
                     selectRootPrompt
@@ -236,6 +238,42 @@ struct ScaleDetailView: View {
                     .padding(.horizontal, 4)
                 }
                 .frame(height: 50)
+            }
+        }
+    }
+    
+    private var practiceButton: some View {
+        Button {
+            showScalePractice = true
+        } label: {
+            HStack {
+                Image(systemName: "play.circle.fill")
+                    .font(.title2)
+                Text("开始音阶练习")
+                    .font(.headline)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding()
+            .background(Color.blue.opacity(0.1))
+            .foregroundColor(.blue)
+            .cornerRadius(12)
+        }
+        .buttonStyle(.plain)
+        .disabled(!viewModel.isSelectedComplete)
+        .sheet(isPresented: $showScalePractice) {
+            if let scale = viewModel.selectedScale,
+               let root = viewModel.selectedRoot {
+                NavigationStack {
+                    ScalePracticeSetupView(
+                        scale: scale,
+                        root: root,
+                        fingerings: viewModel.fingerings,
+                        instrumentType: viewModel.instrumentType
+                    )
+                }
             }
         }
     }
