@@ -1,0 +1,2369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贝斯/吉他练习</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #007aff;
+            --primary-light: #e8f4fd;
+            --secondary: #5856d6;
+            --success: #34c759;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+            --bg: #f5f5f7;
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --text-secondary: #86868b;
+            --border: #d2d2d7;
+            --fretboard-bg: #3a3a3c;
+            --fretboard-line: #8e8e93;
+            --string-color: #c7c7cc;
+            --note-color: #007aff;
+            --note-highlight: #ff9500;
+            --root-note: #ff3b30;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 14px 16px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-btn:hover {
+            background: var(--primary-light);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 16px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .icon {
+            font-size: 20px;
+        }
+
+        /* Scale Library */
+        .scale-library {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+            .scale-library {
+                grid-template-columns: 260px 1fr;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .scale-library {
+                grid-template-columns: 220px 260px 1fr;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .scale-library {
+                grid-template-columns: 240px 280px 1fr;
+            }
+        }
+
+        /* Make the detail panel (3rd column) take full remaining space */
+        @media (min-width: 1024px) {
+            #scale-detail {
+                min-width: 0;
+            }
+        }
+
+        .category-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .category-list {
+                flex-direction: column;
+                flex-wrap: nowrap;
+            }
+        }
+
+        .category-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .scale-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .scale-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scale-item:hover {
+            background: var(--primary-light);
+        }
+
+        .scale-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Root Note Selector */
+        .root-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            padding: 16px 0;
+        }
+
+        .root-btn {
+            width: 44px;
+            height: 44px;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            background: var(--card-bg);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .root-btn:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .root-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Octave Selector */
+        .octave-selector {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .octave-selector .control-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .octave-selector .control-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .octave-selector .control-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Instrument Toggle */
+        .instrument-toggle {
+            display: flex;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+
+        .instrument-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .instrument-btn.active {
+            background: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Fretboard */
+        .fretboard-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px 0;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .fretboard-canvas {
+            display: block;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        /* Scale Info */
+        .scale-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .info-item {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Fingering Pattern */
+        .fingering-pattern {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .position-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: var(--primary-light);
+            border-radius: 16px;
+            font-size: 13px;
+        }
+
+        .position-badge .string-num {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .position-badge .fret-num {
+            color: var(--text-secondary);
+        }
+
+        /* Metronome */
+        .metronome {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .tempo-display {
+            font-size: 64px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 16px 0;
+        }
+
+        .tempo-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .tempo-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .tempo-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: var(--bg);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tempo-btn:hover {
+            background: var(--primary-light);
+        }
+
+        .tempo-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tempo-slider {
+            width: 200px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--bg);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .tempo-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .tempo-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .play-btn {
+            width: 80px;
+            height: 80px;
+            border: none;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 24px 0;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,122,255,0.3);
+        }
+
+        .play-btn:active {
+            transform: scale(0.98);
+        }
+
+        .play-btn.playing {
+            background: var(--danger);
+        }
+
+        .beat-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .beat-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.1s;
+        }
+
+        .beat-dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+        }
+
+        .beat-dot.downbeat.active {
+            background: var(--danger);
+        }
+
+        .time-sig-selector {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .time-sig-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--card-bg);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-sig-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Interactive Fretboard */
+        .interactive-fretboard {
+            padding: 16px 0;
+        }
+
+        .fretboard-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+
+        .control-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .control-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .note-info {
+            background: var(--bg);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .note-info-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .note-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+        }
+
+        .note-info-item {
+            text-align: center;
+            padding: 8px;
+            background: var(--card-bg);
+            border-radius: 6px;
+        }
+
+        .note-info-item .label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .note-info-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Scale Detail Header */
+        .scale-detail-header {
+            text-align: center;
+            padding: 16px 0;
+        }
+
+        .scale-detail-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .scale-detail-header .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Interval Display */
+        .interval-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 12px 0;
+        }
+
+        .interval-badge {
+            padding: 4px 10px;
+            background: var(--bg);
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .interval-badge.root {
+            background: var(--root-note);
+            color: white;
+        }
+
+        /* Pattern Navigation */
+        .pattern-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .pattern-nav-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            background: var(--card-bg);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pattern-nav-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .pattern-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .pattern-counter {
+            font-size: 14px;
+            font-weight: 500;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 767px) {
+            .tab-content {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .tempo-display {
+                font-size: 48px;
+            }
+
+            .play-btn {
+                width: 64px;
+                height: 64px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="library">
+            <span class="icon">&#9835;</span> 音阶与琶音
+        </button>
+        <button class="tab-btn" data-tab="fretboard">
+            <span class="icon">&#9836;</span> 指板
+        </button>
+        <button class="tab-btn" data-tab="metronome">
+            <span class="icon">&#9201;</span> 节拍器
+        </button>
+    </nav>
+
+    <!-- Scale Library Tab -->
+    <div class="tab-content active" id="tab-library">
+        <!-- Instrument Toggle -->
+        <div class="instrument-toggle">
+            <button class="instrument-btn active" data-instrument="bass">贝斯 (5弦)</button>
+            <button class="instrument-btn" data-instrument="guitar">吉他 (6弦)</button>
+        </div>
+
+        <div class="scale-library">
+            <!-- Column 1: Mode Toggle + Category List -->
+            <div class="card">
+                <!-- Mode Toggle: Scales vs Arpeggios -->
+                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                    <button class="control-btn" id="mode-scale-btn" style="flex: 1; justify-content: center; background: var(--primary); color: white; border-color: var(--primary);">
+                        ♪ 音阶
+                    </button>
+                    <button class="control-btn" id="mode-arpeggio-btn" style="flex: 1; justify-content: center;">
+                        ♫ 琶音
+                    </button>
+                </div>
+                <div class="card-title" id="category-title">音阶类型</div>
+                <div class="category-list" id="category-list"></div>
+            </div>
+
+            <!-- Column 2: Scale List -->
+            <div class="card">
+                <div class="card-title" id="scale-list-title">选择分类</div>
+                <div class="scale-list" id="scale-list">
+                    <div class="empty-state">
+                        <div class="icon">&#9834;</div>
+                        <p>请先选择分类</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3: Scale Detail -->
+            <div class="card" id="scale-detail">
+                <div class="empty-state">
+                    <div class="icon">&#9834;</div>
+                    <h3>选择音阶和根音开始练习</h3>
+                    <p>从左侧选择一个音阶类型和具体音阶</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Fretboard Tab -->
+    <div class="tab-content" id="tab-fretboard">
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">&#9836;</span>
+                交互式指板
+            </div>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">
+                点击指板添加音符，再次点击移除。可以查看每个音符的音高信息。
+            </p>
+
+            <!-- Instrument Toggle for Fretboard -->
+            <div class="instrument-toggle">
+                <button class="instrument-btn active" data-fretboard-instrument="bass">贝斯 (5弦)</button>
+                <button class="instrument-btn" data-fretboard-instrument="guitar">吉他 (6弦)</button>
+            </div>
+
+            <!-- Controls -->
+            <div class="fretboard-controls">
+                <button class="control-btn" id="toggle-note-names">
+                    <span>&#9835;</span> 显示音名
+                </button>
+                <button class="control-btn" id="clear-fretboard">
+                    <span>&#128465;</span> 清除
+                </button>
+                <button class="control-btn" id="show-all-notes">
+                    <span>&#9836;</span> 显示所有音符
+                </button>
+            </div>
+
+            <!-- Fretboard Canvas -->
+            <div class="fretboard-container">
+                <canvas id="fretboard-canvas" class="fretboard-canvas"></canvas>
+            </div>
+
+            <!-- Note Info -->
+            <div class="note-info" id="note-info" style="display: none;">
+                <div class="note-info-title">选中的音符</div>
+                <div class="note-info-grid" id="note-info-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metronome Tab -->
+    <div class="tab-content" id="tab-metronome">
+        <div class="card">
+            <div class="metronome">
+                <div class="tempo-display" id="tempo-display">120</div>
+                <div class="tempo-label">BPM</div>
+
+                <div class="tempo-controls">
+                    <button class="tempo-btn" id="tempo-down">-</button>
+                    <input type="range" class="tempo-slider" id="tempo-slider" min="40" max="240" value="120">
+                    <button class="tempo-btn" id="tempo-up">+</button>
+                </div>
+
+                <button class="play-btn" id="play-btn">&#9654;</button>
+
+                <div class="beat-indicator" id="beat-indicator">
+                    <div class="beat-dot downbeat"></div>
+                    <div class="beat-dot"></div>
+                    <div class="beat-dot"></div>
+                    <div class="beat-dot"></div>
+                </div>
+
+                <div class="time-sig-selector">
+                    <button class="time-sig-btn active" data-beats="4">4/4</button>
+                    <button class="time-sig-btn" data-beats="3">3/4</button>
+                    <button class="time-sig-btn" data-beats="6">6/8</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // =====================================================
+    // Music Theory Module
+    // =====================================================
+
+    const NoteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const NoteNamesFlat = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+    const IntervalNames = {
+        0: '根音',
+        1: '小二度',
+        2: '大二度',
+        3: '小三度',
+        4: '大三度',
+        5: '纯四度',
+        6: '三全音',
+        7: '纯五度',
+        8: '小六度',
+        9: '大六度',
+        10: '小七度',
+        11: '大七度',
+        12: '八度'
+    };
+
+    // Scale definitions
+    const Scales = [
+        // Major scales
+        { id: 'major', name: '大调 (Ionian)', category: 'major', intervals: [0, 2, 4, 5, 7, 9, 11, 12] },
+        // Minor scales
+        { id: 'natural_minor', name: '自然小调 (Aeolian)', category: 'minor', intervals: [0, 2, 3, 5, 7, 8, 10, 12] },
+        { id: 'harmonic_minor', name: '和声小调', category: 'minor', intervals: [0, 2, 3, 5, 7, 8, 11, 12] },
+        { id: 'melodic_minor', name: '旋律小调', category: 'minor', intervals: [0, 2, 3, 5, 7, 9, 11, 12] },
+        // Modal scales
+        { id: 'dorian', name: 'Dorian', category: 'modal', intervals: [0, 2, 3, 5, 7, 9, 10, 12] },
+        { id: 'phrygian', name: 'Phrygian', category: 'modal', intervals: [0, 1, 3, 5, 7, 8, 10, 12] },
+        { id: 'lydian', name: 'Lydian', category: 'modal', intervals: [0, 2, 4, 6, 7, 9, 11, 12] },
+        { id: 'mixolydian', name: 'Mixolydian', category: 'modal', intervals: [0, 2, 4, 5, 7, 9, 10, 12] },
+        { id: 'locrian', name: 'Locrian', category: 'modal', intervals: [0, 1, 3, 5, 6, 8, 10, 12] },
+        // Pentatonic scales
+        { id: 'major_pentatonic', name: '大调五声', category: 'pentatonic', intervals: [0, 2, 4, 7, 9, 12] },
+        { id: 'minor_pentatonic', name: '小调五声', category: 'pentatonic', intervals: [0, 3, 5, 7, 10, 12] },
+        // Blues scales
+        { id: 'blues', name: '布鲁斯', category: 'blues', intervals: [0, 3, 5, 6, 7, 10, 12] },
+        { id: 'major_blues', name: '大调布鲁斯', category: 'blues', intervals: [0, 2, 3, 4, 7, 9, 12] },
+        // Exotic scales
+        { id: 'whole_tone', name: '全音阶', category: 'exotic', intervals: [0, 2, 4, 6, 8, 10, 12] },
+        { id: 'diminished', name: '减音阶', category: 'exotic', intervals: [0, 2, 3, 5, 6, 8, 9, 11, 12] },
+        { id: 'chromatic', name: '半音阶', category: 'exotic', intervals: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }
+    ];
+
+    const ScaleCategories = [
+        { id: 'major', name: '大调音阶' },
+        { id: 'minor', name: '小调音阶' },
+        { id: 'modal', name: '调式音阶' },
+        { id: 'pentatonic', name: '五声音阶' },
+        { id: 'blues', name: '布鲁斯音阶' },
+        { id: 'exotic', name: '特殊音阶' }
+    ];
+
+    const ArpeggioCategories = [
+        { id: 'triad', name: '三和弦' },
+        { id: 'seventh', name: '七和弦' },
+        { id: 'ninth', name: '九和弦' },
+        { id: 'suspended', name: '挂留和弦' }
+    ];
+
+    // Arpeggio definitions
+    const Arpeggios = [
+        // 三和弦
+        { id: 'major_triad', name: '大三和弦', category: 'triad', intervals: [0, 4, 7, 12] },
+        { id: 'minor_triad', name: '小三和弦', category: 'triad', intervals: [0, 3, 7, 12] },
+        { id: 'diminished_triad', name: '减三和弦', category: 'triad', intervals: [0, 3, 6, 12] },
+        { id: 'augmented_triad', name: '增三和弦', category: 'triad', intervals: [0, 4, 8, 12] },
+        // 七和弦
+        { id: 'dominant_7th', name: '属七 (Dom7)', category: 'seventh', intervals: [0, 4, 7, 10, 12] },
+        { id: 'major_7th', name: '大七 (Maj7)', category: 'seventh', intervals: [0, 4, 7, 11, 12] },
+        { id: 'minor_7th', name: '小七 (Min7)', category: 'seventh', intervals: [0, 3, 7, 10, 12] },
+        { id: 'half_diminished_7th', name: '半减七 (m7♭5)', category: 'seventh', intervals: [0, 3, 6, 10, 12] },
+        { id: 'diminished_7th', name: '减七 (dim7)', category: 'seventh', intervals: [0, 3, 6, 9, 12] },
+        { id: 'minor_major_7th', name: '小大七 (mMaj7)', category: 'seventh', intervals: [0, 3, 7, 11, 12] },
+        { id: 'augmented_7th', name: '增七 (+7)', category: 'seventh', intervals: [0, 4, 8, 10, 12] },
+        // 九和弦
+        { id: 'dominant_9th', name: '属九 (9)', category: 'ninth', intervals: [0, 4, 7, 10, 14, 12] },
+        { id: 'major_9th', name: '大九 (Maj9)', category: 'ninth', intervals: [0, 4, 7, 11, 14, 12] },
+        { id: 'minor_9th', name: '小九 (Min9)', category: 'ninth', intervals: [0, 3, 7, 10, 14, 12] },
+        // 挂留和弦
+        { id: 'sus4', name: '挂四 (sus4)', category: 'suspended', intervals: [0, 5, 7, 12] },
+        { id: 'sus2', name: '挂二 (sus2)', category: 'suspended', intervals: [0, 2, 7, 12] }
+    ];
+
+    // Guitar chord categories and definitions
+    const GuitarChordCategories = [
+        { id: 'major', name: '大调和弦' },
+        { id: 'minor', name: '小调和弦' },
+        { id: 'seventh', name: '七和弦' },
+        { id: 'barre', name: '封闭和弦' },
+        { id: 'sus', name: '挂留和弦' },
+        { id: 'diminished', name: '减和弦' },
+        { id: 'augmented', name: '增和弦' },
+        { id: 'ninth', name: '九和弦' },
+        { id: 'sixth', name: '六和弦' }
+    ];
+
+    const GuitarChords = [
+        // 大调和弦
+        { id: 'C', name: 'C', category: 'major', fingering: [0, 1, 0, 2, 3, null], baseFret: 1 },
+        { id: 'G', name: 'G', category: 'major', fingering: [3, 0, 0, 0, 2, 3], baseFret: 1 },
+        { id: 'D', name: 'D', category: 'major', fingering: [2, 3, 2, 0, null, null], baseFret: 1 },
+        { id: 'E', name: 'E', category: 'major', fingering: [0, 0, 1, 2, 2, 0], baseFret: 1 },
+        { id: 'A', name: 'A', category: 'major', fingering: [0, 2, 2, 2, 0, null], baseFret: 1 },
+
+        // 小调和弦
+        { id: 'Am', name: 'Am', category: 'minor', fingering: [0, 1, 2, 2, 0, null], baseFret: 1 },
+        { id: 'Em', name: 'Em', category: 'minor', fingering: [0, 0, 0, 2, 2, 0], baseFret: 1 },
+        { id: 'Dm', name: 'Dm', category: 'minor', fingering: [1, 3, 2, 0, null, null], baseFret: 1 },
+
+        // 七和弦
+        { id: 'G7', name: 'G7', category: 'seventh', fingering: [1, 0, 0, 0, 2, 3], baseFret: 1 },
+        { id: 'C7', name: 'C7', category: 'seventh', fingering: [0, 1, 3, 2, 3, null], baseFret: 1 },
+        { id: 'D7', name: 'D7', category: 'seventh', fingering: [2, 1, 2, 0, null, null], baseFret: 1 },
+        { id: 'E7', name: 'E7', category: 'seventh', fingering: [0, 0, 1, 0, 2, 0], baseFret: 1 },
+        { id: 'A7', name: 'A7', category: 'seventh', fingering: [0, 2, 0, 2, 0, null], baseFret: 1 },
+
+        // 封闭和弦
+        { id: 'F', name: 'F', category: 'barre', fingering: [1, 1, 2, 3, 3, 1], baseFret: 1 },
+        { id: 'Fm', name: 'Fm', category: 'barre', fingering: [1, 1, 1, 3, 3, 1], baseFret: 1 },
+        { id: 'Bm', name: 'Bm', category: 'barre', fingering: [2, 3, 4, 4, 2, null], baseFret: 2 },
+        { id: 'Cm', name: 'Cm', category: 'barre', fingering: [3, 4, 5, 5, 3, null], baseFret: 3 },
+        { id: 'Gm', name: 'Gm', category: 'barre', fingering: [3, 3, 3, 5, 5, 3], baseFret: 3 },
+
+        // 挂留和弦
+        { id: 'Csus4', name: 'Csus4', category: 'sus', fingering: [0, 1, 0, 3, 3, null], baseFret: 1 },
+        { id: 'Dsus4', name: 'Dsus4', category: 'sus', fingering: [3, 3, 3, 0, null, null], baseFret: 1 },
+        { id: 'Gsus4', name: 'Gsus4', category: 'sus', fingering: [3, 1, 0, 0, 3, 3], baseFret: 1 },
+        { id: 'Asus4', name: 'Asus4', category: 'sus', fingering: [0, 3, 2, 2, 0, null], baseFret: 1 },
+
+        // 减和弦
+        { id: 'Bdim', name: 'Bdim', category: 'diminished', fingering: [0, 2, 4, 3, 2, null], baseFret: 1 },
+        { id: 'Cdim', name: 'Cdim', category: 'diminished', fingering: [0, 3, 2, 4, 3, null], baseFret: 1 },
+
+        // 增和弦
+        { id: 'Caug', name: 'Caug', category: 'augmented', fingering: [0, 1, 1, 2, 3, null], baseFret: 1 },
+        { id: 'Eaug', name: 'Eaug', category: 'augmented', fingering: [0, 0, 1, 2, 3, 0], baseFret: 1 },
+
+        // 九和弦
+        { id: 'C9', name: 'C9', category: 'ninth', fingering: [0, 3, 3, 2, 3, null], baseFret: 1 },
+        { id: 'G9', name: 'G9', category: 'ninth', fingering: [3, 1, 0, 0, 2, 3], baseFret: 1 },
+        { id: 'D9', name: 'D9', category: 'ninth', fingering: [2, 1, 2, 0, null, null], baseFret: 1 },
+
+        // 六和弦
+        { id: 'C6', name: 'C6', category: 'sixth', fingering: [0, 0, 0, 2, 3, null], baseFret: 1 },
+        { id: 'G6', name: 'G6', category: 'sixth', fingering: [0, 0, 0, 0, 2, 3], baseFret: 1 },
+        { id: 'D6', name: 'D6', category: 'sixth', fingering: [2, 2, 2, 0, null, null], baseFret: 1 }
+    ];
+
+    // Fretboard configurations
+    const FretboardConfigs = {
+        bass: {
+            stringCount: 5,
+            fretCount: 24,
+            tuning: [43, 38, 33, 28, 23], // G2, D2, A1, E1, B0 (high to low, top to bottom)
+            label: '五弦贝斯'
+        },
+        guitar: {
+            stringCount: 6,
+            fretCount: 22,
+            tuning: [64, 59, 55, 50, 45, 40], // E4, B3, G3, D3, A2, E2 (high to low, top to bottom)
+            label: '六弦吉他'
+        }
+    };
+
+    // Get pitch name from MIDI number
+    function getPitchName(midi) {
+        const noteIndex = midi % 12;
+        const octave = Math.floor(midi / 12) - 1;
+        return NoteNames[noteIndex] + octave;
+    }
+
+    function getNoteName(midi) {
+        return NoteNames[midi % 12];
+    }
+
+    // Get interval symbol for display
+    function getIntervalSymbol(interval) {
+        const symbols = {
+            0: '1',
+            1: '♭2',
+            2: '2',
+            3: '♭3',
+            4: '3',
+            5: '4',
+            6: '♭5',
+            7: '5',
+            8: '♭6',
+            9: '6',
+            10: '♭7',
+            11: '7',
+            12: '8',
+            13: '♭9',
+            14: '9'
+        };
+        return symbols[interval] || interval.toString();
+    }
+
+    // Get all positions for a pitch class on the fretboard
+    function getPositionsForPitchClass(pitchClass, config) {
+        const positions = [];
+        for (let stringIndex = 0; stringIndex < config.stringCount; stringIndex++) {
+            const openString = config.tuning[stringIndex];
+            for (let fret = 0; fret <= config.fretCount; fret++) {
+                const midi = openString + fret;
+                if (midi % 12 === pitchClass) {
+                    positions.push({ stringIndex, fret });
+                }
+            }
+        }
+        return positions;
+    }
+
+    // Get all positions for a scale
+    function getScalePositions(scale, rootMidi, config) {
+        const rootPitchClass = rootMidi % 12;
+        const pitchClasses = scale.intervals.map(i => (rootPitchClass + i) % 12);
+        const uniquePitchClasses = [...new Set(pitchClasses)];
+        
+        return uniquePitchClasses.map(pc => ({
+            pitchClass: pc,
+            positions: getPositionsForPitchClass(pc, config)
+        }));
+    }
+
+    // Generate fingering patterns - matching iOS app algorithm
+    function generateFingerings(scaleOrArpeggio, rootMidi, config) {
+        const intervals = scaleOrArpeggio.intervals;
+
+        // Generate pitch sequence (e.g., C, D, E, F, G, A, B, C for major scale)
+        const pitches = intervals.map(interval => rootMidi + interval);
+
+        // For each pitch, find all positions on the fretboard within range
+        const candidatesPerNote = pitches.map(midi => {
+            const positions = [];
+            for (let stringIndex = 0; stringIndex < config.stringCount; stringIndex++) {
+                const openString = config.tuning[stringIndex];
+                const fret = midi - openString;
+                if (fret >= 0 && fret <= config.fretCount) {
+                    positions.push({
+                        stringIndex: stringIndex,
+                        fret: fret,
+                        midi: midi
+                    });
+                }
+            }
+            return positions;
+        });
+
+        // Check if all notes have at least one position
+        if (candidatesPerNote.some(candidates => candidates.length === 0)) {
+            return [];
+        }
+
+        const patterns = [];
+        const maxFretSpan = 5; // Max fret distance between consecutive notes
+        const maxPositionWidth = 8; // Max fret span for entire pattern (increased from 6)
+        const maxPatterns = 30;
+
+        // Backtrack algorithm to find valid patterns
+        function backtrack(index, currentPath) {
+            if (patterns.length >= maxPatterns) return;
+
+            if (index >= candidatesPerNote.length) {
+                // Found a complete pattern
+                const baseFret = Math.min(...currentPath.map(p => p.fret));
+                patterns.push(currentPath.map(p => ({
+                    stringIndex: p.stringIndex,
+                    fret: p.fret,
+                    pitchClass: p.midi % 12
+                })));
+                return;
+            }
+
+            // Sort candidates by preference score
+            const sortedCandidates = [...candidatesPerNote[index]].sort((a, b) => {
+                const scoreA = preferenceScore(a, currentPath[currentPath.length - 1]);
+                const scoreB = preferenceScore(b, currentPath[currentPath.length - 1]);
+                return scoreA - scoreB;
+            });
+
+            for (const position of sortedCandidates) {
+                // Check constraints
+                if (currentPath.length > 0) {
+                    const lastPos = currentPath[currentPath.length - 1];
+                    const fretSpan = Math.abs(position.fret - lastPos.fret);
+                    if (fretSpan > maxFretSpan) continue;
+
+                    const allFrets = currentPath.map(p => p.fret).concat([position.fret]);
+                    const span = Math.max(...allFrets) - Math.min(...allFrets);
+                    if (span > maxPositionWidth) continue;
+                }
+
+                currentPath.push(position);
+                backtrack(index + 1, currentPath);
+                currentPath.pop();
+            }
+        }
+
+        // Preference score: strongly prefer lowest frets, flexible string selection
+        function preferenceScore(pos, prevPos) {
+            let score = 0;
+
+            // Strongly prefer lowest frets
+            score += pos.fret * 2; // Linear penalty for higher frets
+
+            // Extra reward for first position (1-7)
+            if (pos.fret >= 1 && pos.fret <= 7) {
+                score -= 15;
+            }
+
+            // Light penalty for open strings
+            if (pos.fret === 0) score += 3;
+
+            if (prevPos) {
+                // Penalize large fret jumps
+                score += Math.abs(pos.fret - prevPos.fret) * 1.5;
+                // Light penalty for string jumps (allow flexibility)
+                score += Math.abs(pos.stringIndex - prevPos.stringIndex) * 0.5;
+            } else {
+                // Very slight preference for middle strings
+                score += Math.abs(pos.stringIndex - 2) * 0.2;
+            }
+
+            return score;
+        }
+
+        backtrack(0, []);
+
+        // Deduplicate patterns
+        const unique = [];
+        const seen = new Set();
+        for (const pattern of patterns) {
+            const key = pattern.map(p => `${p.stringIndex}-${p.fret}`).join(',');
+            if (!seen.has(key)) {
+                seen.add(key);
+                unique.push(pattern);
+            }
+        }
+
+        return unique.slice(0, 15);
+    }
+
+    // Generate chord fingering display
+    function getChordFingeringPositions(chord, config) {
+        if (config.stringCount !== 6) return [];
+
+        const positions = [];
+        const baseFret = chord.baseFret;
+
+        chord.fingering.forEach((fret, stringIndex) => {
+            if (fret !== null) {
+                const actualFret = fret === 0 ? 0 : fret + baseFret - 1;
+                const midi = config.tuning[stringIndex] + actualFret;
+                positions.push({
+                    stringIndex,
+                    fret: actualFret,
+                    pitchClass: midi % 12,
+                    isOpen: fret === 0,
+                    isMuted: false
+                });
+            }
+        });
+
+        return positions;
+    }
+
+    // =====================================================
+    // UI State
+    // =====================================================
+
+    const state = {
+        currentTab: 'library',
+        instrument: 'bass',
+        mode: 'scale', // 'scale' or 'arpeggio'
+        selectedCategory: null,
+        selectedScale: null,
+        selectedArpeggio: null,
+        selectedChord: null,
+        selectedRoot: 0, // C
+        octaveOffset: 0, // -1, 0, or +1 octave
+        selectedPatternIndex: 0,
+        patterns: [],
+        fretboardNotes: [],
+        showNoteNames: true,
+        showAllNotes: false,
+        selectedFretboardNote: null
+    };
+
+    // =====================================================
+    // Tab Navigation
+    // =====================================================
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
+            switchTab(tab);
+        });
+    });
+
+    function switchTab(tab) {
+        state.currentTab = tab;
+        
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.tab === tab);
+        });
+        
+        document.querySelectorAll('.tab-content').forEach(c => {
+            c.classList.toggle('active', c.id === `tab-${tab}`);
+        });
+        
+        if (tab === 'fretboard') {
+            requestAnimationFrame(() => drawFretboard());
+        }
+    }
+
+    // =====================================================
+    // Instrument Toggle
+    // =====================================================
+
+    document.querySelectorAll('.instrument-btn[data-instrument]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.instrument = btn.dataset.instrument;
+            document.querySelectorAll('.instrument-btn[data-instrument]').forEach(b => {
+                b.classList.toggle('active', b === btn);
+            });
+            updateScaleDetail();
+        });
+    });
+
+    document.querySelectorAll('.instrument-btn[data-fretboard-instrument]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.instrument = btn.dataset.fretboardInstrument;
+            document.querySelectorAll('.instrument-btn[data-fretboard-instrument]').forEach(b => {
+                b.classList.toggle('active', b === btn);
+            });
+            drawFretboard();
+        });
+    });
+
+    // =====================================================
+    // Scale Library
+    // =====================================================
+
+    // Mode toggle (Scale vs Arpeggio)
+    document.getElementById('mode-scale-btn')?.addEventListener('click', () => {
+        state.mode = 'scale';
+        state.selectedCategory = null;
+        state.selectedScale = null;
+        state.selectedArpeggio = null;
+        document.getElementById('mode-scale-btn').style.background = 'var(--primary)';
+        document.getElementById('mode-scale-btn').style.color = 'white';
+        document.getElementById('mode-scale-btn').style.borderColor = 'var(--primary)';
+        document.getElementById('mode-arpeggio-btn').style.background = '';
+        document.getElementById('mode-arpeggio-btn').style.color = '';
+        document.getElementById('mode-arpeggio-btn').style.borderColor = '';
+        document.getElementById('category-title').textContent = '音阶类型';
+        renderCategories();
+        renderScaleList();
+        updateScaleDetail();
+    });
+
+    document.getElementById('mode-arpeggio-btn')?.addEventListener('click', () => {
+        state.mode = 'arpeggio';
+        state.selectedCategory = null;
+        state.selectedScale = null;
+        state.selectedArpeggio = null;
+        document.getElementById('mode-arpeggio-btn').style.background = 'var(--primary)';
+        document.getElementById('mode-arpeggio-btn').style.color = 'white';
+        document.getElementById('mode-arpeggio-btn').style.borderColor = 'var(--primary)';
+        document.getElementById('mode-scale-btn').style.background = '';
+        document.getElementById('mode-scale-btn').style.color = '';
+        document.getElementById('mode-scale-btn').style.borderColor = '';
+        document.getElementById('category-title').textContent = '琶音类型';
+        renderCategories();
+        renderScaleList();
+        updateScaleDetail();
+    });
+
+    function renderCategories() {
+        const container = document.getElementById('category-list');
+        const categories = state.mode === 'scale' ? ScaleCategories : ArpeggioCategories;
+        
+        container.innerHTML = categories.map(cat => `
+            <button class="category-btn" data-category="${cat.id}">
+                ${cat.name}
+            </button>
+        `).join('');
+        
+        container.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.selectedCategory = btn.dataset.category;
+                state.selectedScale = null;
+                state.selectedArpeggio = null;
+                container.querySelectorAll('.category-btn').forEach(b => {
+                    b.classList.toggle('active', b === btn);
+                });
+                renderScaleList();
+                updateScaleDetail();
+            });
+        });
+    }
+
+    function renderScaleList() {
+        const container = document.getElementById('scale-list');
+        const titleEl = document.getElementById('scale-list-title');
+
+        if (!state.selectedCategory) {
+            titleEl.textContent = state.mode === 'scale' ? '选择音阶' : '选择琶音';
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">&#9834;</div>
+                    <p>请先选择${state.mode === 'scale' ? '音阶' : '琶音'}类型</p>
+                </div>
+            `;
+            return;
+        }
+
+        let items = [];
+        let categoryName = '';
+
+        if (state.mode === 'scale') {
+            const category = ScaleCategories.find(c => c.id === state.selectedCategory);
+            categoryName = category?.name || '';
+            titleEl.textContent = categoryName;
+            items = Scales.filter(s => s.category === state.selectedCategory);
+        } else {
+            const category = ArpeggioCategories.find(c => c.id === state.selectedCategory);
+            categoryName = category?.name || '';
+            titleEl.textContent = categoryName;
+            items = Arpeggios.filter(a => a.category === state.selectedCategory);
+        }
+
+        container.innerHTML = items.map(item => `
+            <div class="scale-item" data-item-id="${item.id}" data-type="${state.mode}">
+                <span>${item.name}</span>
+                <span style="color: var(--text-secondary);">&#8250;</span>
+            </div>
+        `).join('');
+
+        container.querySelectorAll('.scale-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const type = item.dataset.type;
+                if (type === 'arpeggio') {
+                    state.selectedArpeggio = Arpeggios.find(a => a.id === item.dataset.itemId);
+                    state.selectedScale = null;
+                } else {
+                    state.selectedScale = Scales.find(s => s.id === item.dataset.itemId);
+                    state.selectedArpeggio = null;
+                }
+                state.selectedChord = null;
+                state.selectedPatternIndex = 0;
+                container.querySelectorAll('.scale-item').forEach(i => {
+                    i.classList.toggle('active', i === item);
+                });
+                updateScaleDetail();
+            });
+        });
+    }
+
+    function updateScaleDetail() {
+        const container = document.getElementById('scale-detail');
+
+        // Handle chord display
+        if (state.selectedChord) {
+            const chord = state.selectedChord;
+            const config = FretboardConfigs.guitar; // Chords are for guitar
+            const positions = getChordFingeringPositions(chord, config);
+
+            container.innerHTML = `
+                <div class="scale-detail-header">
+                    <h2>${chord.name} 和弦</h2>
+                    <div class="subtitle">吉他指法图</div>
+                </div>
+
+                <!-- Chord Info -->
+                <div class="scale-info">
+                    <div class="info-item">
+                        <div class="info-label">和弦类型</div>
+                        <div class="info-value">${GuitarChordCategories.find(c => c.id === chord.category)?.name || chord.category}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">起始把位</div>
+                        <div class="info-value">${chord.baseFret}把位</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">使用弦数</div>
+                        <div class="info-value">${chord.fingering.filter(f => f !== null).length} 弦</div>
+                    </div>
+                </div>
+
+                <!-- Fretboard -->
+                <div class="fretboard-container">
+                    <canvas id="scale-fretboard-canvas" class="fretboard-canvas" width="800" height="200"></canvas>
+                </div>
+
+                <!-- Fingering Pattern -->
+                <div class="fingering-pattern" id="fingering-pattern">
+                    ${positions.map(pos => `
+                        <span class="position-badge">
+                            <span class="string-num">${pos.stringIndex + 1}弦</span>
+                            <span class="fret-num">${pos.fret === 0 ? '空弦' : pos.fret + '品'}</span>
+                        </span>
+                    `).join('')}
+                </div>
+            `;
+
+            requestAnimationFrame(() => drawChordFretboard(chord, config));
+            return;
+        }
+
+        // Handle arpeggio or scale
+        const item = state.selectedArpeggio || state.selectedScale;
+        if (!item) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">&#9834;</div>
+                    <h3>选择音阶和根音开始练习</h3>
+                    <p>从左侧选择一个音阶类型和具体音阶</p>
+                </div>
+            `;
+            return;
+        }
+
+        const config = FretboardConfigs[state.instrument];
+        const rootMidi = state.selectedRoot + 24 + (state.octaveOffset * 12); // C1 base + octave offset
+
+        // Generate patterns for current octave
+        state.patterns = generateFingerings(item, rootMidi, config);
+
+        // Check which octaves have valid patterns
+        const octaveAvailability = {};
+        for (const offset of [-1, 0, 1]) {
+            const testRootMidi = state.selectedRoot + 24 + (offset * 12);
+            const testPatterns = generateFingerings(item, testRootMidi, config);
+            octaveAvailability[offset] = testPatterns.length > 0;
+        }
+
+        // If current octave has no patterns but others do, switch to available octave
+        if (state.patterns.length === 0) {
+            for (const offset of [0, 1, -1]) {
+                if (octaveAvailability[offset]) {
+                    state.octaveOffset = offset;
+                    state.patterns = generateFingerings(item, state.selectedRoot + 24 + (offset * 12), config);
+                    break;
+                }
+            }
+        }
+
+        const rootName = NoteNames[state.selectedRoot];
+        const itemType = state.selectedArpeggio ? '琶音' : '音阶';
+
+        container.innerHTML = `
+            <div class="scale-detail-header">
+                <h2>${rootName} ${item.name}</h2>
+                <div class="subtitle">${config.label} · ${itemType}</div>
+            </div>
+
+            <!-- Root Note Selector -->
+            <div class="root-selector" id="root-selector">
+                ${NoteNames.slice(0, 12).map((name, i) => `
+                    <button class="root-btn ${i === state.selectedRoot ? 'active' : ''}" data-root="${i}">
+                        ${name}
+                    </button>
+                `).join('')}
+            </div>
+
+            <!-- Octave Selector (only show available octaves) -->
+            <div class="octave-selector" style="display: flex; gap: 8px; margin-top: 12px; justify-content: center;">
+                ${octaveAvailability[-1] ? `<button class="control-btn ${state.octaveOffset === -1 ? 'active' : ''}" data-octave="-1">-1 八度</button>` : ''}
+                ${octaveAvailability[0] ? `<button class="control-btn ${state.octaveOffset === 0 ? 'active' : ''}" data-octave="0">标准音高</button>` : ''}
+                ${octaveAvailability[1] ? `<button class="control-btn ${state.octaveOffset === 1 ? 'active' : ''}" data-octave="1">+1 八度</button>` : ''}
+            </div>
+
+            <!-- Scale Info -->
+            <div class="scale-info">
+                <div class="info-item">
+                    <div class="info-label">音程结构</div>
+                    <div class="info-value">${item.intervals.join('-')}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">音符数</div>
+                    <div class="info-value">${item.intervals.length} 个</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">指法数量</div>
+                    <div class="info-value">${state.patterns.length} 种</div>
+                </div>
+            </div>
+
+            <!-- Interval Display -->
+            <div class="interval-display">
+                ${item.intervals.map((interval, i) => `
+                    <span class="interval-badge ${i === 0 ? 'root' : ''}">
+                        ${IntervalNames[interval] || interval}
+                    </span>
+                `).join('')}
+            </div>
+
+            <!-- Pattern Navigation -->
+            ${state.patterns.length > 0 ? `
+                <div class="pattern-nav">
+                    <button class="pattern-nav-btn" id="pattern-prev" ${state.selectedPatternIndex === 0 ? 'disabled' : ''}>&#8249;</button>
+                    <span class="pattern-counter">指法 ${state.selectedPatternIndex + 1} / ${state.patterns.length}</span>
+                    <button class="pattern-nav-btn" id="pattern-next" ${state.selectedPatternIndex >= state.patterns.length - 1 ? 'disabled' : ''}>&#8250;</button>
+                </div>
+            ` : ''}
+
+            <!-- Fretboard -->
+            <div class="fretboard-container">
+                <canvas id="scale-fretboard-canvas" class="fretboard-canvas" width="800" height="200"></canvas>
+            </div>
+
+            <!-- Fingering Pattern -->
+            ${state.patterns.length > 0 ? `
+                <div class="fingering-pattern" id="fingering-pattern">
+                    ${state.patterns[state.selectedPatternIndex].map(pos => `
+                        <span class="position-badge">
+                            <span class="string-num">${pos.stringIndex + 1}弦</span>
+                            <span class="fret-num">${pos.fret}品</span>
+                        </span>
+                    `).join('')}
+                </div>
+            ` : `
+                <div class="empty-state" style="padding: 24px;">
+                    <p>未找到合适的指法模式</p>
+                </div>
+            `}
+        `;
+
+        // Bind root selector events
+        container.querySelectorAll('.root-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.selectedRoot = parseInt(btn.dataset.root);
+                state.selectedPatternIndex = 0;
+                updateScaleDetail();
+            });
+        });
+
+        // Bind octave selector events
+        container.querySelectorAll('[data-octave]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.octaveOffset = parseInt(btn.dataset.octave);
+                state.selectedPatternIndex = 0;
+                updateScaleDetail();
+            });
+        });
+
+        // Bind pattern navigation events
+        const prevBtn = container.querySelector('#pattern-prev');
+        const nextBtn = container.querySelector('#pattern-next');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (state.selectedPatternIndex > 0) {
+                    state.selectedPatternIndex--;
+                    updateScaleDetail();
+                }
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (state.selectedPatternIndex < state.patterns.length - 1) {
+                    state.selectedPatternIndex++;
+                    updateScaleDetail();
+                }
+            });
+        }
+
+        // Draw scale fretboard
+        requestAnimationFrame(() => drawScaleFretboard());
+    }
+
+    // =====================================================
+    // Fretboard Drawing
+    // =====================================================
+
+    function drawScaleFretboard() {
+        const canvas = document.getElementById('scale-fretboard-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const config = FretboardConfigs[state.instrument];
+
+        // Set canvas size based on container width
+        const container = canvas.parentElement;
+        const containerWidth = container ? container.clientWidth : 800;
+        const visibleFrets = 15;
+        // Use container width but ensure minimum size for readability
+        const minWidth = visibleFrets * 55 + 80;
+        const width = Math.min(Math.max(containerWidth, minWidth), window.innerWidth - 40);
+        const height = config.stringCount * 50 + 80;
+
+        canvas.width = width;
+        canvas.height = height;
+        // Set style to match canvas size for crisp rendering
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        const leftPadding = 50;
+        const topPadding = 35;
+        const fretWidth = (width - leftPadding - 30) / visibleFrets;
+        const stringSpacing = (height - topPadding - 35) / (config.stringCount - 1);
+
+        // Clear
+        ctx.fillStyle = '#2c2c2e';
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw fret markers
+        const markerFrets = [3, 5, 7, 9, 15];
+        const doubleFrets = [12];
+
+        markerFrets.forEach(fret => {
+            if (fret <= visibleFrets) {
+                const x = leftPadding + fret * fretWidth - fretWidth / 2;
+                const y = topPadding + (config.stringCount - 1) * stringSpacing / 2;
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+
+        doubleFrets.forEach(fret => {
+            if (fret <= visibleFrets) {
+                const x = leftPadding + fret * fretWidth - fretWidth / 2;
+                const y1 = topPadding + (config.stringCount - 1) * stringSpacing * 0.3;
+                const y2 = topPadding + (config.stringCount - 1) * stringSpacing * 0.7;
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(x, y1, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x, y2, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+
+        // Draw frets
+        for (let fret = 0; fret <= visibleFrets; fret++) {
+            const x = leftPadding + fret * fretWidth;
+            ctx.strokeStyle = fret === 0 ? '#fff' : 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = fret === 0 ? 3 : 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, topPadding);
+            ctx.lineTo(x, topPadding + (config.stringCount - 1) * stringSpacing);
+            ctx.stroke();
+        }
+
+        // Draw strings
+        for (let i = 0; i < config.stringCount; i++) {
+            const y = topPadding + i * stringSpacing;
+            ctx.strokeStyle = 'rgba(200,200,200,0.8)';
+            ctx.lineWidth = 3 - i * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(leftPadding - 20, y);
+            ctx.lineTo(leftPadding + visibleFrets * fretWidth, y);
+            ctx.stroke();
+
+            // String label
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(getNoteName(config.tuning[i]), leftPadding - 30, y + 4);
+        }
+
+        // Draw fret numbers
+        for (let fret = 0; fret <= visibleFrets; fret += 2) {
+            const x = leftPadding + fret * fretWidth;
+            const y = topPadding + (config.stringCount - 1) * stringSpacing + 22;
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '10px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(fret.toString(), x, y);
+        }
+
+        // Draw current fingering pattern notes only
+        const item = state.selectedArpeggio || state.selectedScale;
+        if (item && state.patterns.length > 0) {
+            const pattern = state.patterns[state.selectedPatternIndex];
+            const rootMidi = state.selectedRoot + 48;
+            const rootPitchClass = rootMidi % 12;
+
+            // Draw only the notes in current pattern
+            for (const pos of pattern) {
+                const x = pos.fret === 0 ? leftPadding - fretWidth / 2 : leftPadding + pos.fret * fretWidth - fretWidth / 2;
+                const y = topPadding + pos.stringIndex * stringSpacing;
+                const midi = config.tuning[pos.stringIndex] + pos.fret;
+                const pitchClass = midi % 12;
+                const isRoot = pitchClass === rootPitchClass;
+                const radius = 18;
+
+                // Draw circle - root in red, others in blue
+                ctx.fillStyle = isRoot ? '#ff3b30' : '#007aff';
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw white border
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+
+                // Draw note name and interval
+                if (state.showNoteNames) {
+                    const noteName = getNoteName(midi);
+                    
+                    // Find interval for this pitch class
+                    const interval = item.intervals.find(i => (rootPitchClass + i) % 12 === pitchClass);
+                    const intervalName = interval !== undefined ? getIntervalSymbol(interval) : '';
+                    
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(noteName, x, y + 1);
+                    
+                    // Draw interval number below note
+                    if (intervalName) {
+                        ctx.font = '10px -apple-system, sans-serif';
+                        ctx.fillText(intervalName, x, y + 13);
+                    }
+                }
+            }
+        }
+
+        // Auto-scroll to show the pattern
+        if (state.patterns.length > 0 && pattern.length > 0) {
+            const minFret = Math.min(...pattern.map(p => p.fret));
+            const maxFret = Math.max(...pattern.map(p => p.fret));
+            const container = canvas.parentElement;
+            
+            // Calculate scroll position to center the pattern
+            const patternCenterFret = (minFret + maxFret) / 2;
+            const patternCenterX = leftPadding + patternCenterFret * fretWidth;
+            const containerCenterX = container.clientWidth / 2;
+            const scrollLeft = Math.max(0, patternCenterX - containerCenterX);
+            
+            container.scrollLeft = scrollLeft;
+        }
+    }
+
+    function drawChordFretboard(chord, config) {
+        const canvas = document.getElementById('scale-fretboard-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size based on container width
+        const container = canvas.parentElement;
+        const containerWidth = container ? container.clientWidth : 700;
+        const visibleFrets = 12;
+        const width = Math.max(containerWidth, 600);
+        const height = config.stringCount * 55 + 90;
+
+        canvas.width = width;
+        canvas.height = height;
+        // Set style to match canvas size for crisp rendering
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        const leftPadding = 60;
+        const topPadding = 40;
+        const fretWidth = 50;
+        const stringSpacing = 45;
+
+        // Clear
+        ctx.fillStyle = '#2c2c2e';
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw fret markers
+        const markerFrets = [3, 5, 7, 9];
+        const doubleFrets = [12];
+
+        markerFrets.forEach(fret => {
+            if (fret <= visibleFrets) {
+                const x = leftPadding + fret * fretWidth - fretWidth / 2;
+                const y = topPadding + (config.stringCount - 1) * stringSpacing / 2;
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+
+        // Draw frets
+        for (let fret = 0; fret <= visibleFrets; fret++) {
+            const x = leftPadding + fret * fretWidth;
+            ctx.strokeStyle = fret === 0 ? '#fff' : 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = fret === 0 ? 3 : 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, topPadding);
+            ctx.lineTo(x, topPadding + (config.stringCount - 1) * stringSpacing);
+            ctx.stroke();
+        }
+
+        // Draw strings
+        for (let i = 0; i < config.stringCount; i++) {
+            const y = topPadding + i * stringSpacing;
+            ctx.strokeStyle = 'rgba(200,200,200,0.8)';
+            ctx.lineWidth = 3 - i * 0.4;
+            ctx.beginPath();
+            ctx.moveTo(leftPadding - 20, y);
+            ctx.lineTo(leftPadding + visibleFrets * fretWidth, y);
+            ctx.stroke();
+
+            // String label
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = '12px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(getNoteName(config.tuning[i]), leftPadding - 35, y + 4);
+        }
+
+        // Draw fret numbers
+        for (let fret = 0; fret <= visibleFrets; fret += 2) {
+            const x = leftPadding + fret * fretWidth;
+            const y = topPadding + (config.stringCount - 1) * stringSpacing + 25;
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(fret.toString(), x, y);
+        }
+
+        // Draw chord positions
+        const positions = getChordFingeringPositions(chord, config);
+        positions.forEach(pos => {
+            if (pos.fret <= visibleFrets) {
+                const x = pos.fret === 0 ? leftPadding - fretWidth / 2 : leftPadding + pos.fret * fretWidth - fretWidth / 2;
+                const y = topPadding + pos.stringIndex * stringSpacing;
+
+                // Draw circle
+                ctx.fillStyle = pos.isOpen ? '#34c759' : '#007aff';
+                ctx.beginPath();
+                ctx.arc(x, y, 16, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Draw border
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw finger number or note name
+                const midi = config.tuning[pos.stringIndex] + pos.fret;
+                const noteName = getNoteName(midi);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 11px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(noteName, x, y + 4);
+            }
+        });
+    }
+
+    function drawFretboard() {
+        const canvas = document.getElementById('fretboard-canvas');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const config = FretboardConfigs[state.instrument];
+        
+        // Set canvas size based on container width
+        const container = canvas.parentElement;
+        const containerWidth = container ? container.clientWidth : 800;
+        const visibleFrets = 16;
+        const width = Math.max(containerWidth, visibleFrets * 50 + 80);
+        const height = config.stringCount * 50 + 80;
+        
+        canvas.width = width;
+        canvas.height = height;
+        // Set style to match canvas size for crisp rendering
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        
+        const leftPadding = 50;
+        const topPadding = 35;
+        const fretWidth = (width - leftPadding - 30) / visibleFrets;
+        const stringSpacing = (height - topPadding - 35) / (config.stringCount - 1);
+        
+        // Clear
+        ctx.fillStyle = '#2c2c2e';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Draw fret markers
+        const markerFrets = [3, 5, 7, 9, 15];
+        const doubleFrets = [12];
+        
+        markerFrets.forEach(fret => {
+            if (fret <= visibleFrets) {
+                const x = leftPadding + fret * fretWidth - fretWidth / 2;
+                const y = topPadding + (config.stringCount - 1) * stringSpacing / 2;
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+        
+        doubleFrets.forEach(fret => {
+            if (fret <= visibleFrets) {
+                const x = leftPadding + fret * fretWidth - fretWidth / 2;
+                const y1 = topPadding + (config.stringCount - 1) * stringSpacing * 0.3;
+                const y2 = topPadding + (config.stringCount - 1) * stringSpacing * 0.7;
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(x, y1, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x, y2, 6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+        
+        // Draw frets
+        for (let fret = 0; fret <= visibleFrets; fret++) {
+            const x = leftPadding + fret * fretWidth;
+            ctx.strokeStyle = fret === 0 ? '#fff' : 'rgba(255,255,255,0.4)';
+            ctx.lineWidth = fret === 0 ? 3 : 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, topPadding);
+            ctx.lineTo(x, topPadding + (config.stringCount - 1) * stringSpacing);
+            ctx.stroke();
+        }
+        
+        // Draw strings
+        for (let i = 0; i < config.stringCount; i++) {
+            const y = topPadding + i * stringSpacing;
+            ctx.strokeStyle = 'rgba(200,200,200,0.8)';
+            ctx.lineWidth = 3.5 - i * 0.5;
+            ctx.beginPath();
+            ctx.moveTo(leftPadding - 20, y);
+            ctx.lineTo(leftPadding + visibleFrets * fretWidth, y);
+            ctx.stroke();
+            
+            // String label
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = '12px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(getNoteName(config.tuning[i]), leftPadding - 30, y + 4);
+        }
+        
+        // Draw fret numbers
+        for (let fret = 0; fret <= visibleFrets; fret += 2) {
+            const x = leftPadding + fret * fretWidth;
+            const y = topPadding + (config.stringCount - 1) * stringSpacing + 22;
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(fret.toString(), x, y);
+        }
+        
+        // Draw all notes or selected notes
+        if (state.showAllNotes) {
+            for (let stringIndex = 0; stringIndex < config.stringCount; stringIndex++) {
+                for (let fret = 0; fret <= visibleFrets; fret++) {
+                    const x = fret === 0 ? leftPadding - fretWidth / 2 : leftPadding + fret * fretWidth - fretWidth / 2;
+                    const y = topPadding + stringIndex * stringSpacing;
+                    const midi = config.tuning[stringIndex] + fret;
+                    const noteName = getNoteName(midi);
+                    
+                    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.font = '9px -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(noteName, x, y + 3);
+                }
+            }
+        }
+        
+        // Draw user-placed notes
+        state.fretboardNotes.forEach((note, idx) => {
+            if (note.fret <= visibleFrets) {
+                const x = note.fret === 0 ? leftPadding - fretWidth / 2 : leftPadding + note.fret * fretWidth - fretWidth / 2;
+                const y = topPadding + note.stringIndex * stringSpacing;
+                const isSelected = state.selectedFretboardNote === idx;
+                const radius = isSelected ? 16 : 14;
+                
+                ctx.fillStyle = isSelected ? '#ff3b30' : '#007aff';
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                if (state.showNoteNames) {
+                    const midi = config.tuning[note.stringIndex] + note.fret;
+                    const noteName = getNoteName(midi);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 11px -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(noteName, x, y + 4);
+                }
+            }
+        });
+    }
+
+    // Fretboard click handler
+    function handleFretboardClick(e) {
+        const canvas = document.getElementById('fretboard-canvas');
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const config = FretboardConfigs[state.instrument];
+        const visibleFrets = 16;
+        const leftPadding = 50;
+        const topPadding = 35;
+        const fretWidth = (canvas.width - leftPadding - 30) / visibleFrets;
+        const stringSpacing = (canvas.height - topPadding - 35) / (config.stringCount - 1);
+        
+        // Find nearest string
+        let nearestString = 0;
+        let minDist = Infinity;
+        for (let i = 0; i < config.stringCount; i++) {
+            const stringY = topPadding + i * stringSpacing;
+            const dist = Math.abs(y - stringY);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestString = i;
+            }
+        }
+        
+        // Find nearest fret
+        let nearestFret = 0;
+        minDist = Infinity;
+        for (let fret = 0; fret <= visibleFrets; fret++) {
+            const fretX = fret === 0 ? leftPadding - fretWidth / 2 : leftPadding + fret * fretWidth - fretWidth / 2;
+            const dist = Math.abs(x - fretX);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestFret = fret;
+            }
+        }
+        
+        // Check if clicking on existing note
+        const existingIdx = state.fretboardNotes.findIndex(note => 
+            note.stringIndex === nearestString && note.fret === nearestFret
+        );
+        
+        if (existingIdx >= 0) {
+            // Toggle selection or remove
+            if (state.selectedFretboardNote === existingIdx) {
+                state.fretboardNotes.splice(existingIdx, 1);
+                state.selectedFretboardNote = null;
+                updateNoteInfo();
+            } else {
+                state.selectedFretboardNote = existingIdx;
+                updateNoteInfo();
+            }
+        } else {
+            // Add new note
+            state.fretboardNotes.push({ stringIndex: nearestString, fret: nearestFret });
+            state.selectedFretboardNote = state.fretboardNotes.length - 1;
+            updateNoteInfo();
+        }
+        
+        drawFretboard();
+    }
+
+    function updateNoteInfo() {
+        const container = document.getElementById('note-info');
+        const grid = document.getElementById('note-info-grid');
+        
+        if (state.selectedFretboardNote === null || state.selectedFretboardNote >= state.fretboardNotes.length) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        const note = state.fretboardNotes[state.selectedFretboardNote];
+        const config = FretboardConfigs[state.instrument];
+        const midi = config.tuning[note.stringIndex] + note.fret;
+        const pitchName = getPitchName(midi);
+        const noteName = getNoteName(midi);
+        
+        container.style.display = 'block';
+        grid.innerHTML = `
+            <div class="note-info-item">
+                <div class="label">音高</div>
+                <div class="value">${pitchName}</div>
+            </div>
+            <div class="note-info-item">
+                <div class="label">音名</div>
+                <div class="value">${noteName}</div>
+            </div>
+            <div class="note-info-item">
+                <div class="label">弦</div>
+                <div class="value">${note.stringIndex + 1}</div>
+            </div>
+            <div class="note-info-item">
+                <div class="label">品</div>
+                <div class="value">${note.fret}</div>
+            </div>
+            <div class="note-info-item">
+                <div class="label">MIDI</div>
+                <div class="value">${midi}</div>
+            </div>
+        `;
+    }
+
+    // Fretboard controls
+    document.getElementById('toggle-note-names').addEventListener('click', function() {
+        state.showNoteNames = !state.showNoteNames;
+        this.classList.toggle('active', state.showNoteNames);
+        drawFretboard();
+    });
+
+    document.getElementById('clear-fretboard').addEventListener('click', () => {
+        state.fretboardNotes = [];
+        state.selectedFretboardNote = null;
+        updateNoteInfo();
+        drawFretboard();
+    });
+
+    document.getElementById('show-all-notes').addEventListener('click', function() {
+        state.showAllNotes = !state.showAllNotes;
+        this.classList.toggle('active', state.showAllNotes);
+        drawFretboard();
+    });
+
+    // =====================================================
+    // Metronome
+    // =====================================================
+
+    const metronome = {
+        tempo: 120,
+        beats: 4,
+        isPlaying: false,
+        currentBeat: 0,
+        audioContext: null,
+        intervalId: null
+    };
+
+    function initAudioContext() {
+        if (!metronome.audioContext) {
+            metronome.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    function playClick(isDownbeat) {
+        if (!metronome.audioContext) return;
+        
+        const osc = metronome.audioContext.createOscillator();
+        const gain = metronome.audioContext.createGain();
+        
+        osc.connect(gain);
+        gain.connect(metronome.audioContext.destination);
+        
+        osc.frequency.value = isDownbeat ? 1000 : 800;
+        osc.type = 'sine';
+        
+        gain.gain.setValueAtTime(0.3, metronome.audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, metronome.audioContext.currentTime + 0.1);
+        
+        osc.start(metronome.audioContext.currentTime);
+        osc.stop(metronome.audioContext.currentTime + 0.1);
+    }
+
+    function updateBeatIndicator() {
+        const dots = document.querySelectorAll('.beat-dot');
+        dots.forEach((dot, idx) => {
+            dot.classList.toggle('active', idx === metronome.currentBeat);
+        });
+    }
+
+    function startMetronome() {
+        initAudioContext();
+        metronome.isPlaying = true;
+        metronome.currentBeat = 0;
+        
+        const intervalMs = 60000 / metronome.tempo;
+        
+        playClick(true);
+        updateBeatIndicator();
+        
+        metronome.intervalId = setInterval(() => {
+            metronome.currentBeat = (metronome.currentBeat + 1) % metronome.beats;
+            playClick(metronome.currentBeat === 0);
+            updateBeatIndicator();
+        }, intervalMs);
+        
+        document.getElementById('play-btn').classList.add('playing');
+        document.getElementById('play-btn').innerHTML = '&#9646;&#9646;';
+    }
+
+    function stopMetronome() {
+        metronome.isPlaying = false;
+        clearInterval(metronome.intervalId);
+        metronome.currentBeat = 0;
+        updateBeatIndicator();
+        
+        document.getElementById('play-btn').classList.remove('playing');
+        document.getElementById('play-btn').innerHTML = '&#9654;';
+    }
+
+    function updateTempo(newTempo) {
+        metronome.tempo = Math.max(40, Math.min(240, newTempo));
+        document.getElementById('tempo-display').textContent = metronome.tempo;
+        document.getElementById('tempo-slider').value = metronome.tempo;
+        
+        if (metronome.isPlaying) {
+            stopMetronome();
+            startMetronome();
+        }
+    }
+
+    function updateBeats(newBeats) {
+        metronome.beats = newBeats;
+        
+        const container = document.getElementById('beat-indicator');
+        container.innerHTML = '';
+        for (let i = 0; i < newBeats; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'beat-dot' + (i === 0 ? ' downbeat' : '');
+            container.appendChild(dot);
+        }
+        
+        if (metronome.isPlaying) {
+            stopMetronome();
+            startMetronome();
+        }
+    }
+
+    // Metronome event listeners
+    document.getElementById('play-btn').addEventListener('click', () => {
+        if (metronome.isPlaying) {
+            stopMetronome();
+        } else {
+            startMetronome();
+        }
+    });
+
+    document.getElementById('tempo-slider').addEventListener('input', (e) => {
+        updateTempo(parseInt(e.target.value));
+    });
+
+    document.getElementById('tempo-down').addEventListener('click', () => {
+        updateTempo(metronome.tempo - 5);
+    });
+
+    document.getElementById('tempo-up').addEventListener('click', () => {
+        updateTempo(metronome.tempo + 5);
+    });
+
+    document.querySelectorAll('.time-sig-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.time-sig-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateBeats(parseInt(btn.dataset.beats));
+        });
+    });
+
+    // =====================================================
+    // Initialization
+    // =====================================================
+
+    function init() {
+        renderCategories();
+        
+        // Set up fretboard click handler
+        document.getElementById('fretboard-canvas').addEventListener('click', handleFretboardClick);
+        
+        // Initialize note names toggle
+        document.getElementById('toggle-note-names').classList.add('active');
+        
+        // Select first category by default
+        const firstCategory = document.querySelector('.category-btn');
+        if (firstCategory) {
+            firstCategory.click();
+        }
+    }
+
+    // Start the app
+    init();
+    </script>
+</body>
+</html>
