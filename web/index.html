@@ -774,13 +774,16 @@
         <div class="scale-library">
             <!-- Column 1: Mode Toggle + Category List -->
             <div class="card">
-                <!-- Mode Toggle: Scales vs Arpeggios -->
+                <!-- Mode Toggle: Scales vs Arpeggios vs Chords -->
                 <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                     <button class="control-btn" id="mode-scale-btn" style="flex: 1; justify-content: center; background: var(--primary); color: white; border-color: var(--primary);">
                         ♪ 音阶
                     </button>
                     <button class="control-btn" id="mode-arpeggio-btn" style="flex: 1; justify-content: center;">
                         ♫ 琶音
+                    </button>
+                    <button class="control-btn" id="mode-chord-btn" style="flex: 1; justify-content: center; display: none;">
+                        🎸 和弦
                     </button>
                 </div>
                 <div class="card-title" id="category-title">音阶类型</div>
@@ -1315,7 +1318,17 @@
             document.querySelectorAll('.instrument-btn[data-instrument]').forEach(b => {
                 b.classList.toggle('active', b === btn);
             });
-            updateScaleDetail();
+            // Show/hide chord button based on instrument
+            const chordBtn = document.getElementById('mode-chord-btn');
+            if (chordBtn) {
+                chordBtn.style.display = state.instrument === 'guitar' ? 'block' : 'none';
+            }
+            // Reset to scale mode when switching instruments
+            if (state.mode === 'chord' && state.instrument === 'bass') {
+                document.getElementById('mode-scale-btn').click();
+            } else {
+                updateScaleDetail();
+            }
         });
     });
 
@@ -1362,7 +1375,31 @@
         document.getElementById('mode-scale-btn').style.background = '';
         document.getElementById('mode-scale-btn').style.color = '';
         document.getElementById('mode-scale-btn').style.borderColor = '';
+        document.getElementById('mode-chord-btn').style.background = '';
+        document.getElementById('mode-chord-btn').style.color = '';
+        document.getElementById('mode-chord-btn').style.borderColor = '';
         document.getElementById('category-title').textContent = '琶音类型';
+        renderCategories();
+        renderScaleList();
+        updateScaleDetail();
+    });
+
+    document.getElementById('mode-chord-btn')?.addEventListener('click', () => {
+        state.mode = 'chord';
+        state.selectedCategory = null;
+        state.selectedScale = null;
+        state.selectedArpeggio = null;
+        state.selectedChord = null;
+        document.getElementById('mode-chord-btn').style.background = 'var(--primary)';
+        document.getElementById('mode-chord-btn').style.color = 'white';
+        document.getElementById('mode-chord-btn').style.borderColor = 'var(--primary)';
+        document.getElementById('mode-scale-btn').style.background = '';
+        document.getElementById('mode-scale-btn').style.color = '';
+        document.getElementById('mode-scale-btn').style.borderColor = '';
+        document.getElementById('mode-arpeggio-btn').style.background = '';
+        document.getElementById('mode-arpeggio-btn').style.color = '';
+        document.getElementById('mode-arpeggio-btn').style.borderColor = '';
+        document.getElementById('category-title').textContent = '和弦类型';
         renderCategories();
         renderScaleList();
         updateScaleDetail();
@@ -1370,7 +1407,14 @@
 
     function renderCategories() {
         const container = document.getElementById('category-list');
-        const categories = state.mode === 'scale' ? ScaleCategories : ArpeggioCategories;
+        let categories;
+        if (state.mode === 'scale') {
+            categories = ScaleCategories;
+        } else if (state.mode === 'arpeggio') {
+            categories = ArpeggioCategories;
+        } else {
+            categories = GuitarChordCategories;
+        }
         
         container.innerHTML = categories.map(cat => `
             <button class="category-btn" data-category="${cat.id}">
@@ -1397,11 +1441,12 @@
         const titleEl = document.getElementById('scale-list-title');
 
         if (!state.selectedCategory) {
-            titleEl.textContent = state.mode === 'scale' ? '选择音阶' : '选择琶音';
+            const modeText = state.mode === 'scale' ? '音阶' : state.mode === 'arpeggio' ? '琶音' : '和弦';
+            titleEl.textContent = `选择${modeText}`;
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="icon">&#9834;</div>
-                    <p>请先选择${state.mode === 'scale' ? '音阶' : '琶音'}类型</p>
+                    <p>请先选择${modeText}类型</p>
                 </div>
             `;
             return;
@@ -1415,11 +1460,16 @@
             categoryName = category?.name || '';
             titleEl.textContent = categoryName;
             items = Scales.filter(s => s.category === state.selectedCategory);
-        } else {
+        } else if (state.mode === 'arpeggio') {
             const category = ArpeggioCategories.find(c => c.id === state.selectedCategory);
             categoryName = category?.name || '';
             titleEl.textContent = categoryName;
             items = Arpeggios.filter(a => a.category === state.selectedCategory);
+        } else {
+            const category = GuitarChordCategories.find(c => c.id === state.selectedCategory);
+            categoryName = category?.name || '';
+            titleEl.textContent = categoryName;
+            items = GuitarChords.filter(c => c.category === state.selectedCategory);
         }
 
         container.innerHTML = items.map(item => `
@@ -1435,11 +1485,16 @@
                 if (type === 'arpeggio') {
                     state.selectedArpeggio = Arpeggios.find(a => a.id === item.dataset.itemId);
                     state.selectedScale = null;
+                    state.selectedChord = null;
+                } else if (type === 'chord') {
+                    state.selectedChord = GuitarChords.find(c => c.id === item.dataset.itemId);
+                    state.selectedScale = null;
+                    state.selectedArpeggio = null;
                 } else {
                     state.selectedScale = Scales.find(s => s.id === item.dataset.itemId);
                     state.selectedArpeggio = null;
+                    state.selectedChord = null;
                 }
-                state.selectedChord = null;
                 state.selectedPatternIndex = 0;
                 container.querySelectorAll('.scale-item').forEach(i => {
                     i.classList.toggle('active', i === item);
@@ -2347,6 +2402,12 @@
     // =====================================================
 
     function init() {
+        // Hide chord button by default (only show for guitar)
+        const chordBtn = document.getElementById('mode-chord-btn');
+        if (chordBtn) {
+            chordBtn.style.display = 'none';
+        }
+        
         renderCategories();
         
         // Set up fretboard click handler
