@@ -1,6 +1,6 @@
 # 贡献指南
 
-感谢你考虑为 BassPractice 做出贡献!
+感谢你考虑为 BassGuitarPractice 做出贡献!
 
 ## 🚀 快速开始
 
@@ -10,21 +10,21 @@
 2. **安装 XcodeGen**: `brew install xcodegen`
 3. **克隆仓库**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/BassPractice.git
-   cd BassPractice
+   git clone https://github.com/JacquelineZhou53/BassGuitarPractice.git
+   cd BassGuitarPractice
    ```
 4. **生成项目**: `xcodegen generate`
-5. **打开项目**: `open BassPractice.xcodeproj`
+5. **打开项目**: `open BassGuitarPractice.xcodeproj`
 
 ### 运行测试
 
 ```bash
 # 模拟器
-xcodebuild test -project BassPractice.xcodeproj -scheme BassPractice \
+xcodebuild test -project BassGuitarPractice.xcodeproj -scheme BassGuitarPractice \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
 
 # 真机(需先信任电脑)
-xcodebuild test -project BassPractice.xcodeproj -scheme BassPractice \
+xcodebuild test -project BassGuitarPractice.xcodeproj -scheme BassGuitarPractice \
   -destination 'platform=iOS,id=YOUR_DEVICE_UDID'
 ```
 
@@ -185,7 +185,7 @@ final class FretboardTests: XCTestCase {
 
 ## 🐛 报告 Bug
 
-请在 [GitHub Issues](https://github.com/YOUR_USERNAME/BassPractice/issues) 创建 Issue,包含:
+请在 [GitHub Issues](https://github.com/JacquelineZhou53/BassGuitarPractice/issues) 创建 Issue,包含:
 
 ### Bug 报告模板
 
@@ -236,7 +236,7 @@ final class FretboardTests: XCTestCase {
 
 ### 添加新音阶/和弦
 
-编辑 `BassPractice/Features/ScaleLibrary/Data/ScaleDefinitions.swift`:
+编辑 `BassGuitarPractice/Features/ScaleLibrary/Data/ScaleDefinitions.swift`:
 
 ```swift
 // 新增音阶示例
@@ -274,4 +274,4 @@ PR 合并前需满足:
 
 ---
 
-**有问题?** 随时在 [Discussions](https://github.com/YOUR_USERNAME/BassPractice/discussions) 提问!
+**有问题?** 随时在 [Discussions](https://github.com/JacquelineZhou53/BassGuitarPractice/discussions) 提问!

@@ -18,8 +18,8 @@
 
 ```bash
 # 克隆仓库后,直接运行
-git clone https://github.com/YOUR_USERNAME/BassPractice.git
-cd BassPractice
+git clone https://github.com/JacquelineZhou53/BassGuitarPractice.git
+cd BassGuitarPractice
 chmod +x scripts/install.sh
 ./scripts/install.sh
 ```
@@ -91,8 +91,8 @@ chmod +x scripts/quickstart.sh
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/YOUR_USERNAME/BassPractice.git
-cd BassPractice
+git clone https://github.com/JacquelineZhou53/BassGuitarPractice.git
+cd BassGuitarPractice
 
 # 2. 运行一键脚本
 ./scripts/run.sh
@@ -161,7 +161,7 @@ brew install xcodegen
 
 # 或手动清理
 rm -rf build/ .build/
-xcodebuild clean -project BassPractice.xcodeproj -scheme BassPractice
+xcodebuild clean -project BassGuitarPractice.xcodeproj -scheme BassGuitarPractice
 ```
 
 ---
@@ -194,8 +194,8 @@ local preferred_name="iPhone 16 Pro"  # 改为你喜欢的设备
 ```bash
 # 修改 run.sh,注释掉 launch_simulator 调用
 # 或直接运行:
-xcodebuild -project BassPractice.xcodeproj \
-    -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+    -scheme BassGuitarPractice \
     -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
     build
 ```
@@ -248,8 +248,8 @@ xcodebuild -project BassPractice.xcodeproj \
    xcrun simctl list devices available
    
    # Step 3: 手动构建
-   xcodebuild -project BassPractice.xcodeproj \
-     -scheme BassPractice \
+   xcodebuild -project BassGuitarPractice.xcodeproj \
+     -scheme BassGuitarPractice \
      -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
      build
    ```
@@ -291,7 +291,7 @@ xcodebuild -project BassPractice.xcodeproj \
 ./scripts/quickstart.sh
 
 # 然后在 Xcode 中调试
-open BassPractice.xcodeproj
+open BassGuitarPractice.xcodeproj
 ```
 
 ---

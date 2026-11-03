@@ -1,6 +1,6 @@
 # 自编译快速上手指南
 
-本指南面向**没有 iOS 开发经验**的用户,帮助你从零开始在 iPhone/iPad 上安装 BassPractice。
+本指南面向**没有 iOS 开发经验**的用户,帮助你从零开始在 iPhone/iPad 上安装 BassGuitarPractice。
 
 ---
 
@@ -67,8 +67,8 @@ xcode-select --install
 ```bash
 # 在桌面创建文件夹
 cd ~/Desktop
-git clone https://github.com/YOUR_USERNAME/BassPractice.git
-cd BassPractice
+git clone https://github.com/JacquelineZhou53/BassGuitarPractice.git
+cd BassGuitarPractice
 ```
 
 #### 如果你不会用 Git:
@@ -76,7 +76,7 @@ cd BassPractice
 1. 访问项目的 GitHub 页面
 2. 点击绿色 **"Code"** 按钮
 3. 选择 **"Download ZIP"**
-4. 解压到桌面,重命名为 `BassPractice`
+4. 解压到桌面,重命名为 `BassGuitarPractice`
 
 ---
 
@@ -105,13 +105,13 @@ xcodegen --version
 在终端中进入项目目录:
 
 ```bash
-cd ~/Desktop/BassPractice  # 根据你的实际路径调整
+cd ~/Desktop/BassGuitarPractice  # 根据你的实际路径调整
 xcodegen generate
 ```
 
 成功后会看到:
 ```
-✨ Generated project at BassPractice.xcodeproj
+✨ Generated project at BassGuitarPractice.xcodeproj
 ```
 
 ---
@@ -120,9 +120,9 @@ xcodegen generate
 
 1. **打开项目**:
    ```bash
-   open BassPractice.xcodeproj
+   open BassGuitarPractice.xcodeproj
    ```
-   或双击 Finder 中的 `BassPractice.xcodeproj`
+   或双击 Finder 中的 `BassGuitarPractice.xcodeproj`
 
 2. **首次启动 Xcode**:
    - 接受许可协议
@@ -136,7 +136,7 @@ xcodegen generate
    - 选择 **"Personal Team"**(免费)
 
 4. **选择签名团队**:
-   - 左侧项目导航器选中 **BassPractice**(蓝色图标)
+   - 左侧项目导航器选中 **BassGuitarPractice**(蓝色图标)
    - 右侧选择 **"Signing & Capabilities"** 标签
    - Team 下拉框选择你的 **Personal Team**
    - Bundle Identifier 保持 `com.basspractice.app`
@@ -148,7 +148,7 @@ xcodegen generate
 #### 在 Xcode 中运行:
 
 1. 顶部工具栏选择设备:
-   - 点击设备下拉框(显示 "BassPractice" 旁边)
+   - 点击设备下拉框(显示 "BassGuitarPractice" 旁边)
    - 选择 **"iPhone 16 Pro"** 或其他模拟器
 
 2. 点击左上角 **▶️ Run** 按钮(或按 `Cmd+R`)
@@ -164,8 +164,8 @@ xcodegen generate
 xcrun simctl list devices available | grep iPhone
 
 # 构建并运行
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
   build run
 ```
@@ -244,10 +244,10 @@ xcodebuild -project BassPractice.xcodeproj \
 
 ```bash
 # 1. Archive
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   -configuration Release \
-  -archivePath BassPractice.xcarchive \
+  -archivePath BassGuitarPractice.xcarchive \
   archive
 
 # 2. 创建导出配置
@@ -266,11 +266,11 @@ EOF
 
 # 3. 导出 IPA
 xcodebuild -exportArchive \
-  -archivePath BassPractice.xcarchive \
+  -archivePath BassGuitarPractice.xcarchive \
   -exportOptionsPlist ExportOptions.plist \
   -exportPath ./ReleaseIPA
 
-# 4. 生成的 BassPractice.ipa 在 ReleaseIPA 文件夹
+# 4. 生成的 BassGuitarPractice.ipa 在 ReleaseIPA 文件夹
 ```
 
 学生收到 IPA 后:
@@ -295,8 +295,8 @@ xcodebuild -exportArchive \
 **原因**: JS 资源文件缺失  
 **检查**:
 ```bash
-ls -la BassPractice/Resources/notation_template.html
-ls -la BassPractice/Resources/osmd/opensheetmusicdisplay.min.js
+ls -la BassGuitarPractice/Resources/notation_template.html
+ls -la BassGuitarPractice/Resources/osmd/opensheetmusicdisplay.min.js
 ```
 
 如果文件不存在,从 GitHub 重新下载。
@@ -344,16 +344,16 @@ ls -la BassPractice/Resources/osmd/opensheetmusicdisplay.min.js
 git pull origin main
 
 # 2. 清理构建(遇到奇怪问题时)
-xcodebuild clean -project BassPractice.xcodeproj -scheme BassPractice
+xcodebuild clean -project BassGuitarPractice.xcodeproj -scheme BassGuitarPractice
 
 # 3. 构建到模拟器
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
   build run
 
 # 4. 或直接打开 Xcode 图形界面操作
-open BassPractice.xcodeproj
+open BassGuitarPractice.xcodeproj
 ```
 
 ---
@@ -364,14 +364,14 @@ open BassPractice.xcodeproj
 
 ```bash
 # 使用增量构建(不清理)
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   build
 
 # 并行构建(多核 CPU)
 xcodebuild -parallelizeTargets \
-  -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+  -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   build
 ```
 
@@ -380,10 +380,10 @@ xcodebuild -parallelizeTargets \
 ```bash
 # 模拟器日志
 xcrun simctl spawn booted log stream --predicate \
-  'processImagePath contains "BassPractice"'
+  'processImagePath contains "BassGuitarPractice"'
 
 # 真机日志(需先知道设备 UDID)
-idevicesyslog -u YOUR_UDID | grep BassPractice
+idevicesyslog -u YOUR_UDID | grep BassGuitarPractice
 ```
 
 ### 性能分析
@@ -431,13 +431,13 @@ A: 本项目依赖极少(OSMD/VexFlow 是本地 JS 文件),无需包管理器。
 A: 不能。这是纯 SwiftUI 应用,仅限 iOS。如需 Android 版本需完全重写。
 
 **Q: 如何修改 App 图标?**  
-A: 替换 `BassPractice/Resources/Assets.xcassets/AppIcon.appiconset/` 中的图片,然后在 Xcode 中重新生成 Assets Catalog。
+A: 替换 `BassGuitarPractice/Resources/Assets.xcassets/AppIcon.appiconset/` 中的图片,然后在 Xcode 中重新生成 Assets Catalog。
 
 **Q: 如何更改 Bundle ID?**  
 A: 编辑 `project.yml`:
 ```yaml
 targets:
-  BassPractice:
+  BassGuitarPractice:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.yourname.basspractice
 ```
@@ -450,9 +450,8 @@ targets:
 遇到问题?
 
 1. **查看控制台日志**: Xcode → View → Debug Area → Activate Console
-2. **搜索 Issue**: [GitHub Issues](https://github.com/YOUR_USERNAME/BassPractice/issues)
+2. **搜索 Issue**: [GitHub Issues](https://github.com/JacquelineZhou53/BassGuitarPractice/issues)
 3. **新建 Issue**: 提供详细错误信息和截图
-4. **邮件联系**: your.email@example.com
 
 ---
 

@@ -5,8 +5,8 @@
 ### ...第一次运行这个 App
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/BassPractice.git
-cd BassPractice
+git clone https://github.com/JacquelineZhou53/BassGuitarPractice.git
+cd BassGuitarPractice
 ./scripts/install.sh
 ```
 
@@ -42,7 +42,7 @@ cd BassPractice
 ### ...用 Xcode 图形界面
 
 ```bash
-open BassPractice.xcodeproj
+open BassGuitarPractice.xcodeproj
 ```
 
 然后按 `Cmd+R` 运行。

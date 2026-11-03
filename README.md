@@ -79,9 +79,9 @@
 
 ### 项目结构
 ```
-BassPractice/
+BassGuitarPractice/
 ├── App/                          # App 入口与导航
-│   ├── BassPracticeApp.swift     # @main 入口
+│   ├── BassGuitarPracticeApp.swift     # @main 入口
 │   └── RootView.swift            # 主导航(TabView)
 ├── Core/                         # 核心业务逻辑(无 UI 依赖)
 │   ├── MusicTheory/              # 音乐理论模型
@@ -201,8 +201,8 @@ capoChord = originalChord.withName(transposeName(originalChord.name, semitones))
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/YOUR_USERNAME/BassPractice.git
-cd BassPractice
+git clone https://github.com/JacquelineZhou53/BassGuitarPractice.git
+cd BassGuitarPractice
 
 # 2. 运行一键启动脚本
 chmod +x scripts/run.sh
@@ -236,22 +236,22 @@ chmod +x scripts/run.sh
 brew install xcodegen
 
 # 2. 克隆仓库
-git clone https://github.com/YOUR_USERNAME/BassPractice.git
-cd BassPractice
+git clone https://github.com/JacquelineZhou53/BassGuitarPractice.git
+cd BassGuitarPractice
 
 # 3. 生成 Xcode 项目
 xcodegen generate
 
 # 4. 打开项目
-open BassPractice.xcodeproj
+open BassGuitarPractice.xcodeproj
 ```
 
 ### 方式二:手动创建项目
 
 1. Xcode → File → New → Project → iOS → App
-2. Product Name: `BassPractice`, Interface: `SwiftUI`, Language: `Swift`
+2. Product Name: `BassGuitarPractice`, Interface: `SwiftUI`, Language: `Swift`
 3. 删除自动生成的 `ContentView.swift`
-4. 将整个 `BassPractice/` 文件夹拖入 Xcode 项目根目录
+4. 将整个 `BassGuitarPractice/` 文件夹拖入 Xcode 项目根目录
 5. 确保勾选 "Copy items if needed" 和 Target Membership
 6. 选择模拟器或真机,Cmd+R 运行
 
@@ -259,17 +259,17 @@ open BassPractice.xcodeproj
 
 ```bash
 # 清理构建
-xcodebuild clean -project BassPractice.xcodeproj -scheme BassPractice
+xcodebuild clean -project BassGuitarPractice.xcodeproj -scheme BassGuitarPractice
 
 # 构建到模拟器
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
   build
 
 # 启动模拟器并安装
 xcrun simctl boot "iPhone 16 Pro"
-xcrun simctl install booted build/Debug-iphonesimulator/BassPractice.app
+xcrun simctl install booted build/Debug-iphonesimulator/BassGuitarPractice.app
 xcrun simctl launch booted com.basspractice.app
 ```
 
@@ -300,8 +300,8 @@ xcrun simctl launch booted com.basspractice.app
 xcrun simctl list devices available
 
 # 2. 构建并运行
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
   build run
 ```
@@ -315,8 +315,8 @@ xcodebuild -project BassPractice.xcodeproj \
 
 # 或使用命令行:
 DEVICE_UDID=$(idevice_id -l)  # 获取 UDID
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   -destination "platform=iOS,id=$DEVICE_UDID" \
   build run
 ```
@@ -328,10 +328,10 @@ xcodebuild -project BassPractice.xcodeproj \
 
 ```bash
 # 1. Archive
-xcodebuild -project BassPractice.xcodeproj \
-  -scheme BassPractice \
+xcodebuild -project BassGuitarPractice.xcodeproj \
+  -scheme BassGuitarPractice \
   -configuration Release \
-  -archivePath BassPractice.xcarchive \
+  -archivePath BassGuitarPractice.xcarchive \
   archive
 
 # 2. 创建 ExportOptions.plist
@@ -354,12 +354,12 @@ EOF
 
 # 3. 导出 IPA
 xcodebuild -exportArchive \
-  -archivePath BassPractice.xcarchive \
+  -archivePath BassGuitarPractice.xcarchive \
   -exportOptionsPlist ExportOptions.plist \
   -exportPath ./ReleaseIPA
 ```
 
-将生成的 `BassPractice.ipa` 通过 AirDrop/网盘分享给学生,他们用 Safari 打开安装。
+将生成的 `BassGuitarPractice.ipa` 通过 AirDrop/网盘分享给学生,他们用 Safari 打开安装。
 
 ---
 
@@ -368,8 +368,8 @@ xcodebuild -exportArchive \
 ### ✅ 应该上传的文件
 
 ```
-BassPractice/                  # 源代码根目录
-├── BassPractice/              # Swift 源码和资源
+BassGuitarPractice/                  # 源代码根目录
+├── BassGuitarPractice/              # Swift 源码和资源
 │   ├── App/                   # App 入口
 │   ├── Core/                  # 核心逻辑
 │   ├── Features/              # SwiftUI 视图
@@ -377,8 +377,8 @@ BassPractice/                  # 源代码根目录
 │   ├── Rendering/             # 导出器
 │   ├── Resources/             # OSMD JS 文件 + HTML 模板
 │   ├── Info.plist             # 应用配置
-│   └── BassPracticeApp.swift  # @main
-├── BassPracticeTests/         # 单元测试(如有)
+│   └── BassGuitarPracticeApp.swift  # @main
+├── BassGuitarPracticeTests/         # 单元测试(如有)
 ├── Package.swift              # Swift Package 描述(可选)
 ├── project.yml                # XcodeGen 配置
 ├── .gitignore                 # Git 忽略规则
@@ -449,7 +449,7 @@ Pods/                          # CocoaPods 依赖
 本项目采用 **MIT License** - 详见 [LICENSE](LICENSE) 文件
 
 ```
-Copyright (c) 2024 BassPractice Contributors
+Copyright (c) 2024 BassGuitarPractice Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -465,9 +465,7 @@ in the Software without restriction...
 
 ## 📬 联系方式
 
-- **作者**: [Your Name]
-- **Email**: [your.email@example.com]
-- **GitHub Issues**: [Issues · BassPractice](https://github.com/YOUR_USERNAME/BassPractice/issues)
+- **GitHub Issues**: [Issues · BassGuitarPractice](https://github.com/JacquelineZhou53/BassGuitarPractice/issues)
 
 ---
 
@@ -475,7 +473,7 @@ in the Software without restriction...
 
 如果这个项目对你有帮助,请给个 ⭐️ Star 支持一下!
 
-[![Star History Chart](https://api.star-history.com/svg?repos=YOUR_USERNAME/BassPractice&type=Date)](https://star-history.com)
+[![Star History Chart](https://api.star-history.com/svg?repos=JacquelineZhou53/BassGuitarPractice&type=Date)](https://star-history.com)
 
 ---
 
