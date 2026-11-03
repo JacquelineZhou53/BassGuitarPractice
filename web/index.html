@@ -1569,7 +1569,9 @@
         }
 
         const config = FretboardConfigs[state.instrument];
-        const rootMidi = state.selectedRoot + 24 + (state.octaveOffset * 12); // C1 base + octave offset
+        // Use different base octave for bass vs guitar
+        const baseOctave = state.instrument === 'bass' ? 24 : 48; // C1 for bass, C3 for guitar
+        const rootMidi = state.selectedRoot + baseOctave + (state.octaveOffset * 12);
 
         // Generate patterns for current octave
         state.patterns = generateFingerings(item, rootMidi, config);
@@ -1577,7 +1579,7 @@
         // Check which octaves have valid patterns
         const octaveAvailability = {};
         for (const offset of [-1, 0, 1]) {
-            const testRootMidi = state.selectedRoot + 24 + (offset * 12);
+            const testRootMidi = state.selectedRoot + baseOctave + (offset * 12);
             const testPatterns = generateFingerings(item, testRootMidi, config);
             octaveAvailability[offset] = testPatterns.length > 0;
         }
@@ -1587,7 +1589,7 @@
             for (const offset of [0, 1, -1]) {
                 if (octaveAvailability[offset]) {
                     state.octaveOffset = offset;
-                    state.patterns = generateFingerings(item, state.selectedRoot + 24 + (offset * 12), config);
+                    state.patterns = generateFingerings(item, state.selectedRoot + baseOctave + (offset * 12), config);
                     break;
                 }
             }
@@ -1823,7 +1825,8 @@
         const item = state.selectedArpeggio || state.selectedScale;
         if (item && state.patterns.length > 0) {
             const pattern = state.patterns[state.selectedPatternIndex];
-            const rootMidi = state.selectedRoot + 48;
+            const baseOctave = state.instrument === 'bass' ? 24 : 48;
+            const rootMidi = state.selectedRoot + baseOctave + (state.octaveOffset * 12);
             const rootPitchClass = rootMidi % 12;
 
             // Draw only the notes in current pattern
