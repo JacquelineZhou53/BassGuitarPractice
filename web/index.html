@@ -1148,8 +1148,8 @@
 
         const patterns = [];
         const maxFretSpan = 5; // Max fret distance between consecutive notes
-        const maxPositionWidth = 8; // Max fret span for entire pattern (increased from 6)
-        const maxPatterns = 30;
+        const maxPositionWidth = 10; // Max fret span for entire pattern (allow more string flexibility)
+        const maxPatterns = 40; // Generate more patterns for variety
 
         // Backtrack algorithm to find valid patterns
         function backtrack(index, currentPath) {
@@ -1191,29 +1191,43 @@
             }
         }
 
-        // Preference score: strongly prefer lowest frets, flexible string selection
+        // Preference score: encourage string variety for better playability
         function preferenceScore(pos, prevPos) {
             let score = 0;
 
-            // Strongly prefer lowest frets
-            score += pos.fret * 2; // Linear penalty for higher frets
-
-            // Extra reward for first position (1-7)
+            // Prefer frets in first position (1-7) but allow higher frets
             if (pos.fret >= 1 && pos.fret <= 7) {
-                score -= 15;
+                score -= 12;
+            } else if (pos.fret >= 8 && pos.fret <= 12) {
+                score -= 5; // Also good
             }
 
-            // Light penalty for open strings
-            if (pos.fret === 0) score += 3;
+            // Light penalty for open strings (can be awkward in patterns)
+            if (pos.fret === 0) score += 2;
+
+            // Moderate penalty for very high frets
+            if (pos.fret > 12) score += pos.fret * 0.5;
 
             if (prevPos) {
                 // Penalize large fret jumps
-                score += Math.abs(pos.fret - prevPos.fret) * 1.5;
-                // Light penalty for string jumps (allow flexibility)
-                score += Math.abs(pos.stringIndex - prevPos.stringIndex) * 0.5;
+                const fretJump = Math.abs(pos.fret - prevPos.fret);
+                score += fretJump * 1.2;
+                
+                // REWARD string changes (encourage using different strings)
+                const stringJump = Math.abs(pos.stringIndex - prevPos.stringIndex);
+                if (stringJump === 1) {
+                    score -= 3; // Bonus for adjacent string (very natural)
+                } else if (stringJump === 2) {
+                    score -= 1; // Small bonus for skipping one string
+                } else if (stringJump === 0) {
+                    score += 1; // Small penalty for staying on same string (less flexible)
+                } else {
+                    score += stringJump * 0.8; // Penalty for big string jumps
+                }
             } else {
-                // Very slight preference for middle strings
-                score += Math.abs(pos.stringIndex - 2) * 0.2;
+                // Slight preference for middle strings
+                const middleString = config.stringCount === 5 ? 2 : 3;
+                score += Math.abs(pos.stringIndex - middleString) * 0.3;
             }
 
             return score;
